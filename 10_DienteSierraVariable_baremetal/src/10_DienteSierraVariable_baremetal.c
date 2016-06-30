@@ -31,7 +31,7 @@
  *
  */
 
-/** \brief Blinking Bare Metal example source file
+/** \brief Diente de Sierra Bare Metal example source file
  **
  ** This is a mini example of the CIAA Firmware.
  **
@@ -63,7 +63,7 @@
 
 #include "timers.h"
 #include "dac.h"
-/*#include "interrupt_timers.h"*/
+#include "tecla.h"
 #include "10_DienteSierraVariable_baremetal.h"         /* <= own header */
 
 
@@ -71,12 +71,14 @@
 #define DELAY 200
 
 /*==================[internal data declaration]==============================*/
-uint8_t bandera=0;
-uint32_t cont=0;
-uint32_t contEscalon=0;
-uint32_t FondoEscala=0;
-uint32_t Vref=0;
 
+uint32_t contEscalon=0;
+uint32_t FondoEscala=1024;
+uint32_t Vref=0;
+uint8_t intervalo=1;
+
+
+Tecla tecEj10;
 
 /*==================[internal functions declaration]=========================*/
 void RIT_IRQHandler (void){
@@ -84,8 +86,8 @@ void RIT_IRQHandler (void){
 
 
 	/*"cont" se incrementa cada 1ms. El salto de cada escalón está regido por "contEscalon" y será cada 10ms. De esta manera, la diente de sierra se recorreraá completamente en 10seg*/
-	  contEscalon+=10;
-	  if(contEscalon>=1024){
+	  contEscalon++;
+	  if(contEscalon>=FondoEscala){
 		 	contEscalon=0;}
 
 
@@ -120,9 +122,20 @@ timers_init ();
 
 dac_init();
 
-FondoEscala= Vref*1024/3.3;
+tecla_init();
+
 
 	   while (1){
+		   leer_tecla (&tecEj10);
+		   if(tecEj10.tecla_1==TRUE){if (FondoEscala>=1024)FondoEscala=1024;
+		   	   	   	   	   	   	   	   else FondoEscala+=10;}
+		   if(tecEj10.tecla_2==TRUE){if (FondoEscala<=10)FondoEscala=10;
+	   	   	   	   	   	   	   	   	   else FondoEscala-=10;}
+		   if(tecEj10.tecla_3==TRUE){if (intervalo>=20)intervalo=20;
+	   	   	   	   	   	   	   	   	   else intervalo+=1;}
+		   if(tecEj10.tecla_4==TRUE){if (intervalo<=1)intervalo=1;
+	   	   	   	   	   	   	   	   	   else intervalo-=1;}
+		   timers_Set_Value(intervalo);
 		   cargar_dato_dac (contEscalon);
 	   }
 
