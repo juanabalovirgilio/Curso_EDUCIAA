@@ -1,4 +1,4 @@
-/* Copyright 2016, XXXXXXXXX  
+/* Copyright 2016, XXXXXX
  * All rights reserved.
  *
  * This file is part of CIAA Firmware.
@@ -31,13 +31,18 @@
  *
  */
 
+/** \brief Blinking Bare Metal example source file
+ **
+ ** This is a mini example of the CIAA Firmware.
+ **
+ **/
 
 /** \addtogroup CIAA_Firmware CIAA Firmware
  ** @{ */
 
 /** \addtogroup Examples CIAA Firmware Examples
  ** @{ */
-/** \addtogroup Baremetal Bare Metal LED Driver
+/** \addtogroup Baremetal Bare Metal example source file
  ** @{ */
 
 /*
@@ -55,30 +60,16 @@
 /*==================[inclusions]=============================================*/
 
 
-#include "uart.h"
-
-
-
-
-
-
-
-
-
-
+#include "led.h"
+#include "tecla.h"
+#include "8_teclado_baremetal.h"         /* <= own header */
 
 
 /*==================[macros and definitions]=================================*/
+#define DELAY 5000000
 
-#define TRUE 1
-#define FALSE 0
-
-
-LPC_USART_T *PuntUART;
-
-ADC_CLOCK_SETUP_T ADCSetupClk;
-
-
+uint8_t aux=0;
+uint32_t cont;
 /*==================[internal data declaration]==============================*/
 
 /*==================[internal functions declaration]=========================*/
@@ -100,41 +91,35 @@ ADC_CLOCK_SETUP_T ADCSetupClk;
  *          warnings or errors.
  */
 
-void uart_init (void){
-	Chip_UART_Init(LPC_USART2);
-	Chip_SCU_PinMux(7,1,MD_PDN,FUNC6);
-	Chip_SCU_PinMux(7,2,MD_PLN|MD_EZI|MD_ZI, FUNC6);
-	Chip_UART_SetupFIFOS(LPC_USART2, UART_FCR_FIFO_EN|UART_FCR_TRG_LEV0);
-	Chip_UART_SetBaud(LPC_USART2,115200);
-	Chip_UART_TXEnable(LPC_USART2);
+
+
+int main(void)
+{
+
+
+Tecla Tecla_EduCIAA;
+
+   /* Se inicializan los puertos correspondientes a los Leds de la placa y las teclas*/
+led_init ();
+teclado_init();
+
+	   while (1){
+
+		   	   leer_teclado (&Tecla_EduCIAA);
+
+		   	   for(aux=0; aux<Tecla_EduCIAA.valorTecla; aux++){
+		   		encender_led(1);
+		   		for(cont=DELAY;cont!=0;cont --);
+		   		apagar_led(1);
+		   		for(cont=DELAY;cont!=0;cont --);
+		   	   }
+	   }
+
+	   return 0;
 }
-
-uint8_t uart_leer_dato (){
-	return Chip_UART_ReadByte(LPC_USART2);
-}
-
-void uart_escribir_dato(uint8_t data){
-	Chip_UART_SendByte(LPC_USART2, data );
-}
-
-uint8_t uart_estado_T (){
-	Chip_UART_ReadLineStatus(LPC_USART2);
-	if (LPC_USART2->LSR &&UART_LSR_TEMT!=FALSE) return TRUE;
-	else return FALSE;
-}
-
-uint8_t uart_estado_R (){
-	Chip_UART_ReadLineStatus(LPC_USART2);
-	if (LPC_USART2->LSR &&UART_LSR_RDR !=FALSE) return TRUE;
-		else return FALSE;
-}
-
-
-
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /*==================[end of file]============================================*/
-
 

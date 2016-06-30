@@ -31,8 +31,8 @@
  *
  */
 
-#ifndef ADC_H
-#define ADC_H
+#ifndef UART_H
+#define UART_H
 /** \brief Bare Metal example header file
  **
  ** This is a mini example of the CIAA Firmware
@@ -96,12 +96,12 @@
 
 /*==================[external functions declaration]=========================*/
 
-void adc_init (uint32_t Modulo);
+void uart_init (void);
 
-void adc_config_canal (ADC_CHANNEL_T canal, FunctionalState estado );
-void adc_config_modulo (uint32_t modulo, uint8_t canal);
-void adc_modoInicio (ADC_START_MODE_T modoInicio, ADC_EDGE_CFG_T flanco);
-void  leer_dato_adc (uint16_t *dato, ADC_CHANNEL_T canal);
+uint8_t uart_leer_dato ();
+void uart_escribir_dato(uint8_t data);
+uint8_t uart_estado_T ();
+uint8_t uart_estado_R ();
 
 
 

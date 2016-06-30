@@ -63,7 +63,6 @@
 
 #include "timers.h"
 #include "led.h"
-/*#include "interrupt_timers.h"*/
 #include "11_ConversorAD_baremetal.h"         /* <= own header */
 
 
@@ -82,9 +81,6 @@
 #define Led_2 2
 #define Led_3 3
 /*==================[internal data declaration]==============================*/
-uint8_t bandera=0;
-uint32_t cont=0;
-uint32_t contEscalon=0;
 uint16_t dato=0;
 
 

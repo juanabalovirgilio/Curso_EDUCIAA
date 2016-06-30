@@ -170,13 +170,13 @@ return TRUE;
 	return TRUE;
 }
 
- uint8_t tooglear_led (int8_t Led)
+ uint8_t togglear_led (int8_t Led)
 {switch (Led){
-	case Led_1: Chip_GPIO_SetPinOutToggle(LPC_GPIO_PORT,GPIO0,LED1Pin);
+	case Led_1: Chip_GPIO_SetPinToggle(LPC_GPIO_PORT,GPIO0,LED1Pin);
 				break;
-	case Led_2: Chip_GPIO_SetPinOutToggle(LPC_GPIO_PORT,GPIO1,LED2Pin);
+	case Led_2: Chip_GPIO_SetPinToggle(LPC_GPIO_PORT,GPIO1,LED2Pin);
 				break;
-	case Led_3: Chip_GPIO_SetPinOutToggle(LPC_GPIO_PORT,GPIO1,LED3Pin);
+	case Led_3: Chip_GPIO_SetPinToggle(LPC_GPIO_PORT,GPIO1,LED3Pin);
 				break;
 	default: return FALSE;
 				break;
@@ -227,7 +227,7 @@ return TRUE;
 
 
  /*En la siguiente función se evalúa el estado de cada Led del RGB. Si ninguno es modificado, la función devuelve un estado "False"*/
- uint8_t tooglear_ledRGB ( LedRGB *LedRGB)
+ uint8_t togglear_ledRGB ( LedRGB *LedRGB)
  {uint8_t estado;
 
  if(LedRGB->Rojo) {Chip_GPIO_SetPinOutToggle(LPC_GPIO_PORT,GPIO5,RGBPinRojo);
@@ -246,7 +246,7 @@ return TRUE;
  }
 
  /*En la siguiente función se evalúa el estado de cada Led del RGB. Si ninguno es modificado, la función devuelve un estado "False"*/
-   void tooglear_ledRGB_ref ( LedRGB *LedRGB)
+   void togglear_ledRGB_ref ( LedRGB *LedRGB)
    {
 
    if((LedRGB->Rojo)>=(LedRGB->Ref)) Chip_GPIO_SetPinOutHigh(LPC_GPIO_PORT,GPIO5,RGBPinRojo);

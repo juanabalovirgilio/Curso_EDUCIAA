@@ -94,13 +94,13 @@ void timers_init (void)
 {Chip_RIT_Init (LPC_RITIMER); //Inicializa puertos a partir de una direccion base
 //NVIC_ClearPendingIRQ(RITIMER_IRQn);
 NVIC_EnableIRQ (RITIMER_IRQn);
-Chip_RIT_SetTimerInterval(LPC_RITIMER,1);
+
 }
 
-/*
-uint8_t timers_Set_Value (uint32_t intervalo)
+
+void timers_Set_Value (uint32_t intervalo)
 {Chip_RIT_SetTimerInterval(LPC_RITIMER,intervalo);
-}*/
+}
 
 void RIT_clear_flag(void)
 {Chip_RIT_ClearInt (LPC_RITIMER);

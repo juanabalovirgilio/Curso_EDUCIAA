@@ -31,8 +31,8 @@
  *
  */
 
-#ifndef _12_PSERIE_BAREMETAL_H_
-#define _12_PSERIE_BAREMETAL_H_
+#ifndef _12_UART_BAREMETAL_H_
+#define _12_UART_BAREMETAL_H_
 /** \brief Bare Metal example header file
  **
  ** This is a mini example of the CIAA Firmware

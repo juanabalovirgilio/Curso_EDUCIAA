@@ -78,10 +78,20 @@
 
 
 typedef struct{
+		uint8_t tecla_0;
 		uint8_t tecla_1;
 		uint8_t tecla_2;
 		uint8_t tecla_3;
 		uint8_t tecla_4;
+		uint8_t tecla_5;
+		uint8_t tecla_6;
+		uint8_t tecla_7;
+		uint8_t tecla_8;
+		uint8_t tecla_9;
+		uint8_t tecla_A;
+		uint8_t tecla_N;
+		uint8_t valorTecla;
+
 
 } Tecla;
 
@@ -105,8 +115,10 @@ typedef struct{
 /*==================[external functions declaration]=========================*/
 
 uint8_t tecla_init (void);
+uint8_t teclado_init (void);
 
 void  leer_tecla (Tecla *Tecla_CIAA);
+void  leer_teclado (Tecla *Tecla_CIAA);
 
 
 

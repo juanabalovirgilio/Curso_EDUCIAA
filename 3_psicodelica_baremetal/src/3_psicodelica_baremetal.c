@@ -31,7 +31,7 @@
  *
  */
 
-/** \brief Blinking Bare Metal example source file
+/** \brief Psicodelia Bare Metal example source file
  **
  ** This is a mini example of the CIAA Firmware.
  **

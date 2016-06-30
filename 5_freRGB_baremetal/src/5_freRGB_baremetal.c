@@ -31,7 +31,7 @@
  *
  */
 
-/** \brief Blinking Bare Metal example source file
+/** \brief Control Frecuencia de Led RGB Bare Metal example source file
  **
  ** This is a mini example of the CIAA Firmware.
  **
@@ -63,7 +63,6 @@
 #include "led.h"
 #include "timers.h"
 #include "tecla.h"
-/*#include "interrupt_timers.h"*/
 #include "5_freRGB_baremetal.h"         /* <= own header */
 
 

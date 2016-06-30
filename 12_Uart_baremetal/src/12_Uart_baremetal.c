@@ -63,24 +63,32 @@
 
 #include "timers.h"
 #include "led.h"
-/*#include "interrupt_timers.h"*/
-#include "12_PSerie_baremetal.h"         /* <= own header */
-
+#include "uart.h"
+#include "12_Uart_baremetal.h"         /* <= own header */
+//
 
 /*==================[macros and definitions]=================================*/
+#define TRUE 1
+#define FALSE 0
+
 #define DELAY 200
 #define Modulo_0 0
 #define Modulo_1 1
+#define Canal_0 0
+#define Canal_1 1
+#define Canal_2 2
+#define Canal_3 3
+#define Canal_4 4
+#define Canal_5 5
 
 
-#define Led_1 1
-#define Led_2 2
-#define Led_3 3
+#define r 114
+#define a 97
+#define v 118
+#define c 99
 /*==================[internal data declaration]==============================*/
-uint8_t bandera=0;
-uint32_t cont=0;
-uint32_t contEscalon=0;
-uint16_t dato=0;
+uint8_t dato=97;
+uint8_t lectura=0;
 
 
 
@@ -93,6 +101,7 @@ ADC_STATUS_T estadoConversion;
 
 
 /*==================[internal functions declaration]=========================*/
+
 void RIT_IRQHandler (void){
 	RIT_clear_flag();
 
@@ -122,34 +131,49 @@ void RIT_IRQHandler (void){
 
 int main(void)
 {
-
-
-
-
-   /* Se inicializan el timer para generar las interrupciones que permitan generar los escalones del diente de sierra*/
+	/*Se inicializa el timer como fuente de disparo (y base de tiempo de muestreo) para las conversiones*/
 timers_init ();
 
+   	/*En esta aplicacion los leds se encenderán dependiendo de la te tecla pulsada en la PC*/
 led_init ();
 
-adc_init (Modulo_0);
+	/*Se inicializa y configura el módulo de conversión para digitalizar la señal de entrada que será enviada a la PC*/
+
+	adc_init (Modulo_0);
 adc_config_canal (ADC_CH1, ENABLE );
 adc_modoInicio (ADC_NO_START, ADC_TRIGGERMODE_FALLING);
 adc_config_modulo (Modulo_0, ADC_CH1);
 
+	/*Se inicializa el módulo de comunicación de la UART, tanto para lectura como para escritura*/
+uart_init ();
 
 
 	   while (1){
 
-
-		  while (leer_estado_adc(ADC_CH1, ADC_DR_DONE_STAT)!=SET){}
-
-		  leer_dato_adc (&dato, ADC_CH1);
-
-		  if(dato>= 512) encender_led (Led_1);
-		  else apagar_led (Led_1);}
+		   /*En todo momento se convierte el dato analógico del modulo 0 canal 1 y se envia al hiperterminal de la PC*/
 
 
-	   return 0;
+		   /*EL proceso también evalúa si alguna de las tres letras identificatorias de los leds está presionada en el teclado de la PC*/
+		   lectura=uart_leer_dato ();
+		   switch (lectura){
+		   case r: togglear_led(Led_1);
+		   	   	   break;
+		   case a: togglear_led(Led_2);
+		   	   	   break;
+		   case v: togglear_led(Led_3);
+		   	   	   break;
+		   case c: while (leer_estado_adc(ADC_CH1, ADC_DR_DONE_STAT)!=SET){}
+		   	   	   leer_dato_adc (&dato, ADC_CH1);
+		   	   	   uart_escribir_dato(dato*33/1024);  //El dato del conversor se transforma a valor de tension efectivo
+		   	   	   while(uart_estado_T()!=TRUE);
+		   	   	   break;
+		   /*default:apagar_led (Led_1);
+		   	   	   apagar_led (Led_2);
+		   	   	   apagar_led (Led_3);
+		   	   	   break;*/
+		   }
+
+	   }
 }
 
 /** @} doxygen end group definition */

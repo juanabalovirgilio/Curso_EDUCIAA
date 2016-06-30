@@ -31,7 +31,7 @@
  *
  */
 
-/** \brief Blinking Bare Metal example source file
+/** \brief Diente de Sierra Bare Metal example source file
  **
  ** This is a mini example of the CIAA Firmware.
  **
@@ -63,7 +63,6 @@
 
 #include "timers.h"
 #include "dac.h"
-/*#include "interrupt_timers.h"*/
 #include "9_DienteSierraFijo_baremetal.h"         /* <= own header */
 
 
@@ -74,7 +73,7 @@
 uint8_t bandera=0;
 uint32_t cont=0;
 uint32_t contEscalon=0;
-
+uint8_t intervalo=1;
 
 
 
@@ -83,7 +82,7 @@ void RIT_IRQHandler (void){
 	RIT_clear_flag();
 
 
-	/*"cont" se incrementa cada 1ms. El salto de cada escalón está regido por "contEscalon" y será cada 10ms. De esta manera, la diente de sierra se recorreraá completamente en 10seg*/
+	/*El salto de cada escalón está regido por "contEscalon" y será cada 10ms. De esta manera, el diente de sierra se recorreraá completamente en 10seg*/
 	  contEscalon+=10;
 	  if(contEscalon>=1024){
 		 	contEscalon=0;}
@@ -118,7 +117,7 @@ int main(void)
 
    /* Se inicializan el timer para generar las interrupciones que permitan generar los escalones del diente de sierra*/
 timers_init ();
-
+timers_Set_Value(intervalo);
 dac_init();
 
 	   while (1){

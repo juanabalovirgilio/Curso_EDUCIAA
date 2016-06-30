@@ -111,14 +111,14 @@ uint8_t encender_led (int8_t Led);
 
 uint8_t apagar_led (int8_t Led);
 
-uint8_t tooglear_led (int8_t Led);
+uint8_t togglear_led (int8_t Led);
 
 uint8_t encender_ledRGB ( LedRGB *LedRGB);
 
 uint8_t apagar_ledRGB ( LedRGB *LedRGB);
 
-uint8_t tooglear_ledRGB ( LedRGB *LedRGB);
-void tooglear_ledRGB_ref ( LedRGB *LedRGB);
+uint8_t togglear_ledRGB ( LedRGB *LedRGB);
+void togglear_ledRGB_ref ( LedRGB *LedRGB);
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
