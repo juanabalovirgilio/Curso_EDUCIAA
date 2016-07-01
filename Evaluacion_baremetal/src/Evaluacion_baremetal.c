@@ -100,7 +100,7 @@ uint32_t ganancia=0;
 uint8_t banderaBajo=0;
 uint8_t banderaComplemento=0;
 
-Tecla tecEj10;
+Tecla tecEx;
 
 
 ADC_CHANNEL_T canal;
@@ -175,18 +175,18 @@ uart_init ();
 
 
 
-		 leer_tecla (&tecEj10);
-			 if(tecEj10.tecla_1==TRUE){if(ganancia>=topeGananciaSup )ganancia=topeGananciaSup ;
+		 leer_tecla (&tecEx);
+			 if(tecEx.tecla_1==TRUE){if(ganancia>=topeGananciaSup )ganancia=topeGananciaSup ;
 			 	 	 	 	 	 	 	 else ganancia+=10;
 			 	 	 	 	 	 	   banderaBajo=FALSE;
 			 	 	 	 	 	 	   uart_escribir_string(tec1Msj, sizeof(tec1Msj)/sizeof(char));}
-			 if(tecEj10.tecla_2==TRUE){if(ganancia<=topeGananciaInf)ganancia=topeGananciaInf;
+			 if(tecEx.tecla_2==TRUE){if(ganancia<=topeGananciaInf)ganancia=topeGananciaInf;
 				 	 	 	 	 	 	 else ganancia-=10;
 			 	 	 	 	 	 	   banderaBajo=FALSE;
 			 	 	 	 	 	 	   uart_escribir_string(tec2Msj, sizeof(tec2Msj)/sizeof(char));}
-			 if(tecEj10.tecla_3==TRUE){banderaBajo=TRUE;
+			 if(tecEx.tecla_3==TRUE){banderaBajo=TRUE;
 			 	 	 	 	 	 	   uart_escribir_string(tec3Msj, sizeof(tec3Msj)/sizeof(char));}
-			 if(tecEj10.tecla_4==TRUE){if(banderaComplemento==TRUE)banderaComplemento=FALSE;
+			 if(tecEx.tecla_4==TRUE){if(banderaComplemento==TRUE)banderaComplemento=FALSE;
 			 	 	 	 	 	 	 	 else banderaComplemento=TRUE;
 			 	 	 	 	 	 	   uart_escribir_string(tec4Msj, sizeof(tec4Msj)/sizeof(char));}
 
