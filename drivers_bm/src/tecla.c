@@ -226,7 +226,6 @@ uint8_t teclado_init (void){
 
 
 
-
 void leer_teclado (Tecla *TeclaCIAA)
 
 {		tecla=0;

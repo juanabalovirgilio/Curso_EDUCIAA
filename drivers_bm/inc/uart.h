@@ -102,7 +102,7 @@ uint8_t uart_leer_dato ();
 void uart_escribir_dato(uint8_t data);
 uint8_t uart_estado_T ();
 uint8_t uart_estado_R ();
-
+void uart_escribir_string(char message[], uint8_t size);
 
 
 /** @} doxygen end group definition */

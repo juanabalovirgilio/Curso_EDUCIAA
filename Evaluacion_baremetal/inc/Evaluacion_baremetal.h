@@ -1,4 +1,4 @@
-/* Copyright 2016, XXXXXXXXX  
+/* Copyright 2016, XXXXXXX
  * All rights reserved.
  *
  * This file is part of CIAA Firmware.
@@ -31,13 +31,19 @@
  *
  */
 
+#ifndef _EVALUACION_BAREMETAL_H_
+#define _EVALUACION_BAREMETAL_H_
+/** \brief Bare Metal example header file
+ **
+ ** This is a mini example of the CIAA Firmware
+ **
+ **/
 
 /** \addtogroup CIAA_Firmware CIAA Firmware
  ** @{ */
-
 /** \addtogroup Examples CIAA Firmware Examples
  ** @{ */
-/** \addtogroup Baremetal Bare Metal LED Driver
+/** \addtogroup Baremetal Bare Metal example header file
  ** @{ */
 
 /*
@@ -53,106 +59,56 @@
  */
 
 /*==================[inclusions]=============================================*/
+#include "stdint.h"
 
 
-#include "uart.h"
+/*==================[macros]=================================================*/
+#define lpc4337            1
+#define mk60fx512vlq15     2
+
+/*==================[typedef]================================================*/
+
+/*==================[external data declaration]==============================*/
+#if (CPU == mk60fx512vlq15)
+/* Reset_Handler is defined in startup_MK60F15.S_CPP */
+void Reset_Handler( void );
+
+extern uint32_t __StackTop;
+#elif (CPU == lpc4337)
+/** \brief Reset ISR
+ **
+ ** ResetISR is defined in cr_startup_lpc43xx.c
+ **
+ ** \remark the definition is in
+ **         externals/drivers/cortexM4/lpc43xx/src/cr_startup_lpc43xx.c
+ **/
+
+
+extern void ResetISR(void);
+
+/** \brief Stack Top address
+ **
+ ** External declaration for the pointer to the stack top from the Linker Script
+ **
+ ** \remark only a declaration is needed, there is no definition, the address
+ **         is set in the linker script:
+ **         externals/base/cortexM4/lpc43xx/linker/ciaa_lpc4337.ld.
+ **/
+extern void _vStackTop(void);
 
 
 
+void RIT_IRQHandler(void);
 
 
+#else
+#endif
 
-
-
-
-
-
-
-/*==================[macros and definitions]=================================*/
-
-#define TRUE 1
-#define FALSE 0
-
-
-LPC_USART_T *PuntUART;
-
-ADC_CLOCK_SETUP_T ADCSetupClk;
-
-
-/*==================[internal data declaration]==============================*/
-
-/*==================[internal functions declaration]=========================*/
-
-/*==================[internal data definition]===============================*/
-
-/*==================[external data definition]===============================*/
-
-/*==================[internal functions definition]==========================*/
-
-/*==================[external functions definition]==========================*/
-/** \brief Main function
- *
- * This is the main entry point of the software.
- *
- * \returns 0
- *
- * \remarks This function never returns. Return value is only to avoid compiler
- *          warnings or errors.
- */
-
-void uart_init (void){
-	Chip_UART_Init(LPC_USART2);
-	Chip_SCU_PinMux(7,1,MD_PDN,FUNC6);
-	Chip_SCU_PinMux(7,2,MD_PLN|MD_EZI|MD_ZI, FUNC6);
-	Chip_UART_SetupFIFOS(LPC_USART2, UART_FCR_FIFO_EN|UART_FCR_TRG_LEV0);
-	Chip_UART_SetBaud(LPC_USART2,115200);
-	Chip_UART_TXEnable(LPC_USART2);
-}
-
-uint8_t uart_leer_dato (){
-	return Chip_UART_ReadByte(LPC_USART2);
-}
-
-void uart_escribir_dato(uint8_t data){
-	Chip_UART_SendByte(LPC_USART2, data );
-}
-
-uint8_t uart_estado_T (){
-	Chip_UART_ReadLineStatus(LPC_USART2);
-	if (LPC_USART2->LSR &&UART_LSR_TEMT!=FALSE) return TRUE;
-	else return FALSE;
-}
-
-uint8_t uart_estado_R (){
-	Chip_UART_ReadLineStatus(LPC_USART2);
-	if (LPC_USART2->LSR &&UART_LSR_RDR !=FALSE) return TRUE;
-		else return FALSE;
-}
-
-void uart_escribir_string(char message[], uint8_t size)
-{
-	uint8_t msjIndex = 0;
-	uint64_t i;
-
-	/* sending byte by byte*/
-	while(( uart_estado_T () != 0) && (msjIndex < size))
-	{
-		Chip_UART_SendByte((LPC_USART_T *)LPC_USART2, message[msjIndex]);
-
-		/*delay*/
-		for (i=0;i<50000;i++)
-		{
-			asm  ("nop");
-		}
-		msjIndex++;
-	}
-
-}
-
+/*==================[external functions declaration]=========================*/
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /*==================[end of file]============================================*/
-
+#endif /* #ifndef BAREMETAL_BLINKING_H */
 

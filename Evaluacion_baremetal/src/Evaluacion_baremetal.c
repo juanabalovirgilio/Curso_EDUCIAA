@@ -1,4 +1,4 @@
-/* Copyright 2016, XXXXXXXXX  
+/* Copyright 2016, XXXXXX
  * All rights reserved.
  *
  * This file is part of CIAA Firmware.
@@ -31,13 +31,18 @@
  *
  */
 
+/** \
+ **
+ **
+ **
+ **/
 
 /** \addtogroup CIAA_Firmware CIAA Firmware
  ** @{ */
 
 /** \addtogroup Examples CIAA Firmware Examples
  ** @{ */
-/** \addtogroup Baremetal Bare Metal LED Driver
+/** \addtogroup Baremetal Bare Metal example source file
  ** @{ */
 
 /*
@@ -55,33 +60,66 @@
 /*==================[inclusions]=============================================*/
 
 
+
+#include "timers.h"
+#include "led.h"
+#include "dac.h"
+#include "tecla.h"
 #include "uart.h"
-
-
-
-
-
-
-
-
-
-
+#include "Evaluacion_baremetal.h"         /* <= own header */
 
 
 /*==================[macros and definitions]=================================*/
+#define DELAY 200
+#define Modulo_0 0
+#define Modulo_1 1
+#define Canal_0 0
+#define Canal_1 1
+#define Canal_2 2
+#define Canal_3 3
+#define Canal_4 4
+#define Canal_5 5
 
-#define TRUE 1
-#define FALSE 0
+#define topeGananciaSup 300
+#define topeGananciaInf 0
 
 
-LPC_USART_T *PuntUART;
-
-ADC_CLOCK_SETUP_T ADCSetupClk;
-
-
+#define Led_1 1
+#define Led_2 2
+#define Led_3 3
 /*==================[internal data declaration]==============================*/
+uint16_t dato=0;
+uint16_t datoAux=0;
+
+uint32_t contEscalon=0;
+uint32_t FondoEscala=1024;
+uint32_t Vref=0;
+uint8_t intervalo=100;
+uint32_t ganancia=0;
+
+uint8_t banderaBajo=0;
+uint8_t banderaComplemento=0;
+
+Tecla tecEj10;
+
+
+ADC_CHANNEL_T canal;
+FunctionalState estado;
+ADC_START_MODE_T modoInicio;
+ADC_EDGE_CFG_T flanco;
+ADC_STATUS_T estadoConversion;
+
 
 /*==================[internal functions declaration]=========================*/
+void RIT_IRQHandler (void){
+	RIT_clear_flag();
+
+	adc_modoInicio (ADC_START_NOW, ADC_TRIGGERMODE_RISING);
+
+	  contEscalon++;
+	  if(contEscalon>=FondoEscala){
+		 	contEscalon=0;}
+}
 
 /*==================[internal data definition]===============================*/
 
@@ -100,59 +138,76 @@ ADC_CLOCK_SETUP_T ADCSetupClk;
  *          warnings or errors.
  */
 
-void uart_init (void){
-	Chip_UART_Init(LPC_USART2);
-	Chip_SCU_PinMux(7,1,MD_PDN,FUNC6);
-	Chip_SCU_PinMux(7,2,MD_PLN|MD_EZI|MD_ZI, FUNC6);
-	Chip_UART_SetupFIFOS(LPC_USART2, UART_FCR_FIFO_EN|UART_FCR_TRG_LEV0);
-	Chip_UART_SetBaud(LPC_USART2,115200);
-	Chip_UART_TXEnable(LPC_USART2);
-}
 
-uint8_t uart_leer_dato (){
-	return Chip_UART_ReadByte(LPC_USART2);
-}
 
-void uart_escribir_dato(uint8_t data){
-	Chip_UART_SendByte(LPC_USART2, data );
-}
-
-uint8_t uart_estado_T (){
-	Chip_UART_ReadLineStatus(LPC_USART2);
-	if (LPC_USART2->LSR &&UART_LSR_TEMT!=FALSE) return TRUE;
-	else return FALSE;
-}
-
-uint8_t uart_estado_R (){
-	Chip_UART_ReadLineStatus(LPC_USART2);
-	if (LPC_USART2->LSR &&UART_LSR_RDR !=FALSE) return TRUE;
-		else return FALSE;
-}
-
-void uart_escribir_string(char message[], uint8_t size)
+int main(void)
 {
-	uint8_t msjIndex = 0;
-	uint64_t i;
 
-	/* sending byte by byte*/
-	while(( uart_estado_T () != 0) && (msjIndex < size))
-	{
-		Chip_UART_SendByte((LPC_USART_T *)LPC_USART2, message[msjIndex]);
+char tec1Msj[] = "Aumento la ganancia\n\r";
+char tec2Msj[] = "Disminuyo la ganancia\n\r";
+char tec3Msj[] = "Mute\n\r";
+char tec4Msj[] = "Invierto Señal\n\r";
 
-		/*delay*/
-		for (i=0;i<50000;i++)
-		{
-			asm  ("nop");
-		}
-		msjIndex++;
-	}
+/* Se inicializan el timer para generar las interrupciones que permitan generar los escalones del diente de sierra*/
+timers_init ();
+timers_Set_Value(intervalo);
 
+led_init ();
+
+tecla_init();
+
+dac_init();
+
+adc_init (Modulo_0);
+adc_config_canal (ADC_CH1, ENABLE );
+adc_modoInicio (ADC_NO_START, ADC_TRIGGERMODE_FALLING);
+adc_config_modulo (Modulo_0, ADC_CH1);
+
+uart_init ();
+
+
+	   while (1){
+
+
+		 while (leer_estado_adc(ADC_CH1, ADC_DR_DONE_STAT)!=SET){}
+		 togglear_led (Led_1);
+		 leer_dato_adc (&dato, ADC_CH1);
+
+
+
+		 leer_tecla (&tecEj10);
+			 if(tecEj10.tecla_1==TRUE){if(ganancia>=topeGananciaSup )ganancia=topeGananciaSup ;
+			 	 	 	 	 	 	 	 else ganancia+=10;
+			 	 	 	 	 	 	   banderaBajo=FALSE;
+			 	 	 	 	 	 	   uart_escribir_string(tec1Msj, sizeof(tec1Msj)/sizeof(char));}
+			 if(tecEj10.tecla_2==TRUE){if(ganancia<=topeGananciaInf)ganancia=topeGananciaInf;
+				 	 	 	 	 	 	 else ganancia-=10;
+			 	 	 	 	 	 	   banderaBajo=FALSE;
+			 	 	 	 	 	 	   uart_escribir_string(tec2Msj, sizeof(tec2Msj)/sizeof(char));}
+			 if(tecEj10.tecla_3==TRUE){banderaBajo=TRUE;
+			 	 	 	 	 	 	   uart_escribir_string(tec3Msj, sizeof(tec3Msj)/sizeof(char));}
+			 if(tecEj10.tecla_4==TRUE){if(banderaComplemento==TRUE)banderaComplemento=FALSE;
+			 	 	 	 	 	 	 	 else banderaComplemento=TRUE;
+			 	 	 	 	 	 	   uart_escribir_string(tec4Msj, sizeof(tec4Msj)/sizeof(char));}
+
+			 if(banderaComplemento)dato=~dato;
+			 if(banderaBajo==FALSE)dato=dato+ganancia;
+			 else dato=FALSE;
+
+			 cargar_dato_dac (dato);
+
+
+
+	   }
+
+
+
+
+	   return 0;
 }
-
 
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /** @} doxygen end group definition */
 /*==================[end of file]============================================*/
-
 

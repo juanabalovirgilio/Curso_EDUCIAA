@@ -103,7 +103,7 @@ void adc_init (uint32_t Modulo){
 		}
 
 	if(Modulo==1)
-	{Chip_ADC_Init (LPC_ADC1, &ADCSetupClk);
+		{Chip_ADC_Init (LPC_ADC1, &ADCSetupClk);
 			}
 }
 
